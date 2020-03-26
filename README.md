@@ -1,0 +1,2 @@
+# LandSus
+Landslide Suscebility Mapping
