@@ -1,3 +1,5 @@
+# Reference & data download from : https://www.neonscience.org/image-raster-data-r
+
 # load the raster, sp, and rgdal packages
 library(raster)
 library(sp)
