@@ -1,7 +1,7 @@
+# Programmer: Dr. Mustafa ZEYBEK
 
 # Support Vector Machine
-#Remove everything
-rm(list = ls())
+rm(list = ls()) #Remove everything
 # load the raster, sp, and rgdal packages
 library(raster)
 library(sp)

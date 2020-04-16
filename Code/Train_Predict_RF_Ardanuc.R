@@ -1,3 +1,4 @@
+# Programmer: Dr. Mustafa ZEYBEK
 
 # Random Forest for Landslide Susceptibility
 rm(list = ls()) #Remove everything

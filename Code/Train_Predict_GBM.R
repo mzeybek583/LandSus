@@ -1,8 +1,8 @@
+# Programmer: Dr. Mustafa ZEYBEK
 
 ## Stochastic Gradient Boosting 
 ## gradient boosting machine
-#Remove everything
-rm(list = ls())
+rm(list = ls()) #Remove everything
 # load the raster, sp, and rgdal packages
 library(raster)
 library(sp)
