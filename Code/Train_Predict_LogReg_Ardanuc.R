@@ -168,5 +168,6 @@ r1 <- raster::predict(raster_data, model_glm, progress="text")
 plot(r1)
 
 writeRaster(r1,"RESULT/Result_LogReg.tif", overwrite=TRUE)
-cat("Program ended!!!")
-proc.time() - time
+t_end <- proc.time() - time
+cat(sprintf("Program Ended in %5.5f second!!!\n", t_end[3]))
+
