@@ -1,3 +1,0 @@
-new("performance", x.name = "None", y.name = "Area under the ROC curve", 
-    alpha.name = "none", x.values = list(), y.values = list(0.929638854296388), 
-    alpha.values = list())
