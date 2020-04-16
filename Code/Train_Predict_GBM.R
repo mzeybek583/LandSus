@@ -18,7 +18,6 @@ set.seed(917);
 # time 
 time <- proc.time()
 
-
 # DATA --------------------------------------------------------------------
 # import raw data tiffs
 altitude <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/altitude.tif"
@@ -168,7 +167,6 @@ tiff("RESULT/TRAIN_roc_curve_valid_GBM.tiff", units="cm", width=8, height=8, res
 plot(perf_valid, main = "ROC curve for Landslide Detection Validation Data (GBM)", col = "blue", lwd = 3)
 abline(a = 0, b = 1, lwd = 2, lty = 2)
 dev.off()
-
 
 perf.auc_valid <- performance(pred_valid, measure = "auc")
 str(perf.auc_valid)
