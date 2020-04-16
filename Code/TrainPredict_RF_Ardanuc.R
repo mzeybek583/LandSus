@@ -179,6 +179,7 @@ unlist(perf.auc_valid@y.values)
 dput(perf.auc_valid, "TRAIN_valid_RF.txt")
 
 
+# Predict raster with produced Super Model --------------------------------
 ## Apply to raster prediction
 raster_data <- stack(altitude, aspect, corine, curvature, drenaj, fay, jeoloji, slope, twi, yol, cls)
 names(raster_data)
