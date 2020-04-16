@@ -169,5 +169,4 @@ plot(r1)
 
 writeRaster(r1,"RESULT/Result_LogReg.tif", overwrite=TRUE)
 t_end <- proc.time() - time
-cat(sprintf("Program Ended in %5.5f second!!!\n", t_end[3]))
-
+cat(sprintf("Program Ended in %5.1f second!!!\n", t_end[3]))
