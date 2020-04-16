@@ -147,10 +147,10 @@ pred_valid <- prediction(predictions = pred_valid, labels = ValidSet$study_area_
 
 perf <- performance(pred, measure = "tpr", x.measure = "fpr")
 perf_valid <- performance(pred_valid, measure = "tpr", x.measure = "fpr")
-saveRDS(perf_valid,"RESULT/TRAIN_GBM_validation_ROC")
+saveRDS(perf_valid,"RESULT/ROC_Curve_valid_GBM")
 #aa <- readRDS("GBM_validation_ROC")
 #png("TRAIN_roc_curve_train_GBM.png")
-tiff("RESULT/TRAIN_roc_curve_train_GBM.tiff", units="cm", width=8, height=8, res=600)
+tiff("RESULT/ROC_Curve_train_GBM.tiff", units="cm", width=8, height=8, res=600)
 plot(perf, main = "ROC curve for Landslide Detection Train Data (GBM)", col = "blue", lwd = 3)
 abline(a = 0, b = 1, lwd = 2, lty = 2)
 dev.off()
@@ -159,10 +159,10 @@ perf.auc <- performance(pred, measure = "auc")
 str(perf.auc)
 unlist(perf.auc@y.values)
 ## Export accuracy
-dput(perf.auc, "RESULT/TRAIN_GBM.txt")
+dput(perf.auc, "RESULT/Perf_AUC_train_GBM.txt")
 
 #png("TRAIN_roc_curve_valid_GBM.png")
-tiff("RESULT/TRAIN_roc_curve_valid_GBM.tiff", units="cm", width=8, height=8, res=600)
+tiff("RESULT/ROC_Curve_valid_GBM.tiff", units="cm", width=8, height=8, res=600)
 
 plot(perf_valid, main = "ROC curve for Landslide Detection Validation Data (GBM)", col = "blue", lwd = 3)
 abline(a = 0, b = 1, lwd = 2, lty = 2)
@@ -172,7 +172,7 @@ perf.auc_valid <- performance(pred_valid, measure = "auc")
 str(perf.auc_valid)
 unlist(perf.auc_valid@y.values)
 ## Export accuracy
-dput(perf.auc_valid, "RESULT/TRAIN_valid_GBM.txt")
+dput(perf.auc_valid, "RESULT/Perf_AUC_GBM.txt")
 
 # Predict raster with produced Super Model --------------------------------
 ## Apply to raster prediction
@@ -181,6 +181,6 @@ names(raster_data)
 r1 <- raster::predict(raster_data, model_gbm, progress="text")
 plot(r1)
 
-writeRaster(r1,"RESULT/RESULT_GBM.tif", overwrite=TRUE)
+writeRaster(r1,"RESULT/Result_GBM.tif", overwrite=TRUE)
 cat("Program ended!!!")
 proc.time() - time

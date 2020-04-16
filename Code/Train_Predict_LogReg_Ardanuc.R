@@ -77,6 +77,7 @@ sapply(data_df_NA, function(x)sum(is.na(x)))
 # Sample variable
 smpl <- 500
 rto <- 0.7 # Train vs Test raio
+
 ## Random sampling to 10000 data
 heyelan <- data_df_NA[data_df_NA$study_area_heyelan==1,]
 heyelan_degil <- data_df_NA[data_df_NA$study_area_heyelan==0,]
@@ -110,11 +111,11 @@ summary(model_glm)
 
 gbmImp <- varImp(model_glm, scale = TRUE)
 gbmImp
-saveRDS(gbmImp,"RESULT/Logreg_Train_varimportance")
+saveRDS(gbmImp,"RESULT/Model_varimportance_train_LogReg")
 #readRDS("Logreg_Train_varimportance")
 
 #png("TRAIN_varImportance_LogReg.png")
-tiff("RESULT/TRAIN_varImportance_LogReg.tiff", units="cm", width=8, height=8, res=600)
+tiff("RESULT/Model_varimportance_train_LogReg.tiff", units="cm", width=8, height=8, res=600)
 plot(gbmImp, top = 10)
 dev.off()
 
@@ -132,10 +133,10 @@ pred_valid <- prediction(predictions = pred_valid, labels = ValidSet$study_area_
 
 perf <- performance(pred, measure = "tpr", x.measure = "fpr")
 perf_valid <- performance(pred_valid, measure = "tpr", x.measure = "fpr")
-saveRDS(perf_valid,"RESULT/TRAIN_Logreg_validation_ROC")
+saveRDS(perf_valid,"RESULT/ROC_Curve_valid_Logreg")
 #aa <- readRDS("Logreg_validation_ROC")
 #png("TRAIN_roc_curve_train_LogReg.png")
-tiff("RESULT/TRAIN_roc_curve_train_LogReg.tiff", units="cm", width=8, height=8, res=600)
+tiff("RESULT/ROC_Curve_train_LogReg.tiff", units="cm", width=8, height=8, res=600)
 plot(perf, main = "ROC curve for Landslide Detection Train Data (LogReg)", col = "blue", lwd = 3)
 abline(a = 0, b = 1, lwd = 2, lty = 2)
 dev.off()
@@ -144,21 +145,20 @@ perf.auc <- performance(pred, measure = "auc")
 str(perf.auc)
 unlist(perf.auc@y.values)
 ## Export accuracy
-dput(perf.auc, "RESULT/TRAIN_LogReg.txt")
+dput(perf.auc, "RESULT/Perf_AUC_train_LogReg.txt")
 
 #png("TRAIN_roc_curve_valid_LogReg.png")
-tiff("RESULT/TRAIN_roc_curve_valid_LogReg.tiff", units="cm", width=8, height=8, res=600)
+tiff("RESULT/ROC_Curve_valid_LogReg.tiff", units="cm", width=8, height=8, res=600)
 
 plot(perf_valid, main = "ROC curve for Landslide Detection Validation Data (LogReg)", col = "blue", lwd = 3)
 abline(a = 0, b = 1, lwd = 2, lty = 2)
 dev.off()
 
-
 perf.auc_valid <- performance(pred_valid, measure = "auc")
 str(perf.auc_valid)
 unlist(perf.auc_valid@y.values)
 ## Export accuracy
-dput(perf.auc_valid, "RESULT/TRAIN_valid_LogReg.txt")
+dput(perf.auc_valid, "RESULT/Perf_AUC_LogReg.txt")
 
 # Predict raster with produced Super Model --------------------------------
 ## Apply to raster prediction
@@ -167,6 +167,6 @@ names(raster_data)
 r1 <- raster::predict(raster_data, model_glm, progress="text")
 plot(r1)
 
-writeRaster(r1,"RESULT/TRAIN_LogReg.tif", overwrite=TRUE)
+writeRaster(r1,"RESULT/Result_LogReg.tif", overwrite=TRUE)
 cat("Program ended!!!")
 proc.time() - time

@@ -121,11 +121,11 @@ gbmImp <- varImp(model_rf, scale = TRUE)
 gbmImp
 
 
-saveRDS(gbmImp,file = "RESULT/RF_Train_varimportance")
+saveRDS(gbmImp,file = "RESULT/Model_varimportance_train_RF")
 #readRDS("SVM_Train_varimportance")
 
 #png("TRAIN_varImportance_SVM.png")
-tiff("RESULT/TRAIN_varImportance_RF.tiff", units="cm", width=8, height=8, res=600)
+tiff("RESULT/Model_varimportance_train_RF.tiff", units="cm", width=8, height=8, res=600)
 plot(gbmImp, top = 10)
 dev.off()
 
@@ -147,10 +147,10 @@ pred_valid <- prediction(predictions = pred_valid, labels = ValidSet$study_area_
 
 perf <- performance(pred, measure = "tpr", x.measure = "fpr")
 perf_valid <- performance(pred_valid, measure = "tpr", x.measure = "fpr")
-saveRDS(perf_valid,"RESULT/TRAIN_RF_validation_ROC")
+saveRDS(perf_valid,"RESULT/ROC_Curve_valid_RF")
 #aa <- readRDS("Logreg_validation_ROC")
 #png("TRAIN_roc_curve_train_LogReg.png")
-tiff("RESULT/TRAIN_roc_curve_train_RF.tiff", units="cm", width=8, height=8, res=600)
+tiff("RESULT/ROC_Curve_train_RF.tiff", units="cm", width=8, height=8, res=600)
 plot(perf, main = "ROC curve for Landslide Detection Train Data (RF)", col = "blue", lwd = 3)
 abline(a = 0, b = 1, lwd = 2, lty = 2)
 dev.off()
@@ -159,21 +159,20 @@ perf.auc <- performance(pred, measure = "auc")
 str(perf.auc)
 unlist(perf.auc@y.values)
 ## Export accuracy
-dput(perf.auc, "RESULT/TRAIN_RF.txt")
+dput(perf.auc, "RESULT/Perf_AUC_train_RF.txt")
 
 #png("TRAIN_roc_curve_valid_SVM.png")
-tiff("RESULT/TRAIN_roc_curve_valid_RF.tiff", units="cm", width=8, height=8, res=600)
+tiff("RESULT/ROC_Curve_valid_RF.tiff", units="cm", width=8, height=8, res=600)
 
 plot(perf_valid, main = "ROC curve for Landslide Detection Validation Data (RF)", col = "blue", lwd = 3)
 abline(a = 0, b = 1, lwd = 2, lty = 2)
 dev.off()
 
-
 perf.auc_valid <- performance(pred_valid, measure = "auc")
 str(perf.auc_valid)
 unlist(perf.auc_valid@y.values)
 ## Export accuracy
-dput(perf.auc_valid, "RESULT/TRAIN_valid_RF.txt")
+dput(perf.auc_valid, "RESULT/Perf_AUC_RF.txt")
   
 # Predict raster with produced Super Model --------------------------------
 ## Apply to raster prediction
@@ -182,6 +181,6 @@ names(raster_data)
 r1 <- raster::predict(raster_data, model_rf, progress="text")
 plot(r1)
 
-writeRaster(r1,"RESULT/RESULT_RF.tif", overwrite=TRUE)
+writeRaster(r1,"RESULT/Result_RF.tif", overwrite=TRUE)
 cat("Program ended!!!")
 proc.time() - time
