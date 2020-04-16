@@ -184,4 +184,3 @@ plot(r1)
 writeRaster(r1,"RESULT/RESULT_GBM.tif", overwrite=TRUE)
 cat("Program ended!!!")
 proc.time() - time
-
