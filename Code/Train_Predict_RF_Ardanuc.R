@@ -181,5 +181,6 @@ names(raster_data)
 r1 <- raster::predict(raster_data, model_rf, progress="text")
 plot(r1)
 
-writeRaster(r1,"RESULT/TRAIN_RF.tif", overwrite=TRUE)
+writeRaster(r1,"RESULT/RESULT_RF.tif", overwrite=TRUE)
+cat("Program ended!!!")
 proc.time() - time

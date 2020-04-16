@@ -183,5 +183,7 @@ names(raster_data)
 r1 <- raster::predict(raster_data, model_gbm, progress="text")
 plot(r1)
 
-writeRaster(r1,"RESULT/TRAIN_GBM.tif", overwrite=TRUE)
+writeRaster(r1,"RESULT/RESULT_GBM.tif", overwrite=TRUE)
+cat("Program ended!!!")
 proc.time() - time
+
