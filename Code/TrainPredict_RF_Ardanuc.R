@@ -134,6 +134,10 @@ tiff("TRAIN_varImportance_RF.tiff", units="cm", width=8, height=8, res=600)
 plot(gbmImp, top = 10)
 dev.off()
 
+
+# Save Super Model --------------------------------------------------------
+
+
 # Do not change
 saveRDS(model_rf, "super_model_RF")
 # Do not change
@@ -143,6 +147,8 @@ pred_train <-predict(model_rf, TrainSet[,-13])
 pred_valid <-predict(model_rf, ValidSet[,-13])
 
 
+
+# ROC plots ---------------------------------------------------------------
 
 library(ROCR)
 pred <- prediction(predictions = pred_train, labels = TrainSet$study_area_heyelan)
