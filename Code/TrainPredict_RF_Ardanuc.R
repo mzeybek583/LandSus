@@ -111,7 +111,6 @@ model_rf <-train(formula, data= TrainSet, family = identity,
 proc.time()- time
 
 model_rf
-
 names(model_rf)
 model_rf$results
 summary(model_rf)
@@ -129,9 +128,7 @@ tiff("RESULT/TRAIN_varImportance_RF.tiff", units="cm", width=8, height=8, res=60
 plot(gbmImp, top = 10)
 dev.off()
 
-
 # Save Super Model --------------------------------------------------------
-
 
 # Do not change
 saveRDS(model_rf, "RESULT/super_model_RF")
@@ -140,8 +137,6 @@ saveRDS(model_rf, "RESULT/super_model_RF")
 library(gmodels)
 pred_train <-predict(model_rf, TrainSet[,-13])
 pred_valid <-predict(model_rf, ValidSet[,-13])
-
-
 
 # ROC plots ---------------------------------------------------------------
 
