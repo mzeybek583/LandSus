@@ -1,0 +1,3 @@
+new("performance", x.name = "None", y.name = "Area under the ROC curve", 
+    alpha.name = "none", x.values = list(), y.values = list(1), 
+    alpha.values = list())

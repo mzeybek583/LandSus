@@ -19,20 +19,28 @@ time <- proc.time()
 
 # DATA --------------------------------------------------------------------
 # import raw data tiffs
-altitude <- "../Data/R_SVM/altitude.tif"
-aspect <- "../Data/R_SVM/aspect.tif"
-corine <- "../Data/R_SVM/corine.tif"
-curvature <- "../Data/R_SVM/curvature.tif"
-drenaj <- "../Data/R_SVM/dist_drenaj.tif"
-fay <- "../Data/R_SVM/dist_fay.tif"
-jeoloji <- "../Data/R_SVM/jeoloji.tif"
-slope <- "../Data/R_SVM/slope.tif"
-yol <- "../Data/R_SVM/dist_yol.tif"
-twi <- "../Data/R_SVM/twi.tif"
+altitude <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/altitude.tif"
+aspect <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/aspect.tif"
+corine <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/corine.tif"
+curvature <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/curvature.tif"
+drenaj <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/dist_drenaj.tif"
+fay <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/dist_fay.tif"
+jeoloji <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/jeoloji.tif"
+slope <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/slope.tif"
+yol <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/dist_yol.tif"
+twi <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/twi.tif" 
+#twi <- "../Data/R_SVM/twi.tif"
 
 # Landslide Ground Truth DATA
 
-cls <- "../Data/study_area_heyelan/study_area_heyelan.tif"
+cls <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/study_area_heyelan/study_area_heyelan.tif"
+
+# Save Exports to RESULT folder --------------------------------------------------
+mainDir <- "/home/mzeybek/LandSus/Code/"
+subDir <- "RESULT"
+
+dir.create(file.path(mainDir, subDir), showWarnings = FALSE)
+#setwd(file.path(mainDir, subDir))
 
 # create raster stack
 raster_data <- stack(altitude, aspect, corine, curvature, drenaj, fay, jeoloji, slope, twi, yol, cls)
@@ -112,17 +120,12 @@ summary(model_rf)
 gbmImp <- varImp(model_rf, scale = TRUE)
 gbmImp
 
-# Save Exports to folder --------------------------------------------------
-mainDir <- "/home/mzeybek/LandSus/Code/"
-subDir <- "RESULT"
-dir.create(file.path(mainDir, subDir), showWarnings = FALSE)
-#setwd(file.path(mainDir, subDir))
 
-saveRDS(gbmImp,file = "/RESULT/RF_Train_varimportance")
+saveRDS(gbmImp,file = "RESULT/RF_Train_varimportance")
 #readRDS("SVM_Train_varimportance")
 
 #png("TRAIN_varImportance_SVM.png")
-tiff("TRAIN_varImportance_RF.tiff", units="cm", width=8, height=8, res=600)
+tiff("RESULT/TRAIN_varImportance_RF.tiff", units="cm", width=8, height=8, res=600)
 plot(gbmImp, top = 10)
 dev.off()
 
@@ -131,7 +134,7 @@ dev.off()
 
 
 # Do not change
-saveRDS(model_rf, "/RESULT/super_model_RF")
+saveRDS(model_rf, "RESULT/super_model_RF")
 # Do not change
 
 library(gmodels)
@@ -148,10 +151,10 @@ pred_valid <- prediction(predictions = pred_valid, labels = ValidSet$study_area_
 
 perf <- performance(pred, measure = "tpr", x.measure = "fpr")
 perf_valid <- performance(pred_valid, measure = "tpr", x.measure = "fpr")
-saveRDS(perf_valid,"/RESULT/TRAIN_RF_validation_ROC")
+saveRDS(perf_valid,"RESULT/TRAIN_RF_validation_ROC")
 #aa <- readRDS("Logreg_validation_ROC")
 #png("TRAIN_roc_curve_train_LogReg.png")
-tiff("TRAIN_roc_curve_train_RF.tiff", units="cm", width=8, height=8, res=600)
+tiff("RESULT/TRAIN_roc_curve_train_RF.tiff", units="cm", width=8, height=8, res=600)
 plot(perf, main = "ROC curve for Landslide Detection Train Data (RF)", col = "blue", lwd = 3)
 abline(a = 0, b = 1, lwd = 2, lty = 2)
 dev.off()
@@ -160,10 +163,10 @@ perf.auc <- performance(pred, measure = "auc")
 str(perf.auc)
 unlist(perf.auc@y.values)
 ## Export accuracy
-dput(perf.auc, "/RESULT/TRAIN_RF.txt")
+dput(perf.auc, "RESULT/TRAIN_RF.txt")
 
 #png("TRAIN_roc_curve_valid_SVM.png")
-tiff("/RESULT/TRAIN_roc_curve_valid_RF.tiff", units="cm", width=8, height=8, res=600)
+tiff("RESULT/TRAIN_roc_curve_valid_RF.tiff", units="cm", width=8, height=8, res=600)
 
 plot(perf_valid, main = "ROC curve for Landslide Detection Validation Data (RF)", col = "blue", lwd = 3)
 abline(a = 0, b = 1, lwd = 2, lty = 2)
@@ -174,9 +177,8 @@ perf.auc_valid <- performance(pred_valid, measure = "auc")
 str(perf.auc_valid)
 unlist(perf.auc_valid@y.values)
 ## Export accuracy
-dput(perf.auc_valid, "/RESULT/TRAIN_valid_RF.txt")
-
-
+dput(perf.auc_valid, "RESULT/TRAIN_valid_RF.txt")
+  
 # Predict raster with produced Super Model --------------------------------
 ## Apply to raster prediction
 raster_data <- stack(altitude, aspect, corine, curvature, drenaj, fay, jeoloji, slope, twi, yol, cls)
@@ -184,5 +186,5 @@ names(raster_data)
 r1 <- raster::predict(raster_data, model_rf, progress="text")
 plot(r1)
 
-writeRaster(r1,"/RESULT/TRAIN_RF.tif", overwrite=TRUE)
+writeRaster(r1,"RESULT/TRAIN_RF.tif", overwrite=TRUE)
 proc.time() - time
