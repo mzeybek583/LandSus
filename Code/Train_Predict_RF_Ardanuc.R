@@ -1,70 +1,53 @@
 # Programmer: Dr. Mustafa ZEYBEK
 
-# Random Forest for Landslide Susceptibility
+## Stochastic Gradient Boosting 
+## gradient boosting machine
 rm(list = ls()) #Remove everything
-# load the packages
+# load the raster, sp, and rgdal packages
 library(raster)
 library(sp)
 library(rgdal)
 library(caret) 
+
 #library(doParallel)
-
 #registerDoParallel(cores = 3)
+
 set.seed(917);   
-
-#setwd("pathToDirHere") # set the working directory to the data
-
-# time 
-time <- proc.time()
-
+time <- proc.time()# time 
 
 # DATA --------------------------------------------------------------------
-# import raw data tiffs
-altitude <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/altitude.tif"
-aspect <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/aspect.tif"
-corine <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/corine.tif"
-curvature <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/curvature.tif"
-drenaj <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/dist_drenaj.tif"
-fay <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/dist_fay.tif"
-jeoloji <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/jeoloji.tif"
-slope <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/slope.tif"
-yol <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/dist_yol.tif"
-twi <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/twi.tif" 
-#twi <- "../Data/R_SVM/twi.tif"
+# change
+Tiff_path <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/" 
+Working_path <- "/home/mzeybek/LandSus/Code/" # change
+smpl <- 500 # Sample variable
+rto <- 0.7 # Train vs Test raio
 
-# Landslide Ground Truth DATA
+setwd(Tiff_path)
 
-cls <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/study_area_heyelan/study_area_heyelan.tif"
-
-# Save Exports to RESULT folder --------------------------------------------------
-mainDir <- "/home/mzeybek/LandSus/Code/"
-subDir <- "RESULT"
-
-dir.create(file.path(mainDir, subDir), showWarnings = FALSE)
-#setwd(file.path(mainDir, subDir))
-
-# create raster stack
-raster_data <- stack(altitude, aspect, corine, curvature, drenaj, fay, jeoloji, slope, twi, yol, cls)
+# Save Exports to RESULT folder
+Result_Dir <- "RESULT" # Output file # Do not change
+temp = list.files(path = Tiff_path , pattern="\\.tif$", 
+                  full.names = FALSE, recursive = TRUE)
+raster_data <- raster::stack(paste0(temp))
+dir.create(file.path(Working_path, Result_Dir), showWarnings = FALSE)
 
 # check attributes
 raster_data
 proc.time()- time
-
 names(raster_data)
 data_df <- as.data.frame(raster_data, xy=TRUE)
-rm(raster_data)
-
 
 # Train Formula -----------------------------------------------------------
 
-formula <- study_area_heyelan ~ altitude + aspect + corine + curvature + dist_drenaj + dist_fay + jeoloji +  slope + twi + dist_yol
+formula <- study_area_heyelan ~ altitude + aspect + corine + 
+  curvature + dist_drenaj + dist_fay + jeoloji +  slope + twi + dist_yol
 
 ## Normalization function
 # normalize <- function(x) { return((x - min(x)) / (max(x) - min(x))) }
 
-# New libraries if require
-require(e1071) 
-require(rpart)
+#data_df_norm <- as.data.frame(lapply(data_df[], normalize))
+library(e1071) 
+library(rpart)
 
 #Control NA
 sapply(data_df, function(x)sum(is.na(x)))
@@ -75,16 +58,12 @@ data_df_NA <- na.omit(data_df)
 ## Check NA 
 sapply(data_df_NA, function(x)sum(is.na(x)))
 
-
-## Random sampling to sampling data
-# Sample variable
-smpl <- 500
-rto <- 0.7 # Train vs Test raio
-
+## Random sampling data
 heyelan <- data_df_NA[data_df_NA$study_area_heyelan==1,]
 heyelan_degil <- data_df_NA[data_df_NA$study_area_heyelan==0,]
-data_df_NA_sample_heyelan <- heyelan[sample(1:nrow(heyelan), smpl,replace=FALSE),]
-data_df_NA_sample_heyelan_degil <- heyelan_degil[sample(1:nrow(heyelan_degil), smpl,replace=FALSE),]
+data_df_NA_sample_heyelan <- heyelan[sample(1:nrow(heyelan), smpl, replace=FALSE),]
+data_df_NA_sample_heyelan_degil <- heyelan_degil[sample(1:nrow(heyelan_degil), 
+                                                        smpl, replace=FALSE),]
 
 model.data <- rbind(data_df_NA_sample_heyelan, data_df_NA_sample_heyelan_degil)
 #split data into a train and test set 
@@ -96,21 +75,30 @@ summary(ValidSet)
 proc.time()- time
 
 ## All subsequent models are then run in parallel
-
-ctrl <- trainControl(method = "repeatedcv", number = 10, savePredictions = TRUE)
-#grid <- expand.grid(sigma = c(.01, .015, 0.2),
-#                    C = c(0.75, 0.9, 1, 1.1, 1.25)
-#)
-
+fitControl <- trainControl(## 10-fold CV
+  method = "repeatedcv",
+  number = 10,
+  ## repeated ten times
+  repeats = 10)
 
 # Create Model ------------------------------------------------------------
 ## RF Model
+model_rf <-train(formula, data= TrainSet, method='rf',
+                 trControl = fitControl, metric="RMSE",
+                 preProcess = c("center","scale"), 
+             #    ntree = 1000,
+                 nodesize=100)
 
-model_rf <-train(formula, data= TrainSet, family = identity, 
-                 trControl = ctrl, tuneLength =5)
+#                 metric='ROC', 
+#tuneGrid = data.frame(mtry = 3), 
+#                 trControl=tr)
 
+#model_rf2 <-train(formula, data= TrainSet, method='RRF') 
+                 #                 metric='ROC', 
+                 #tuneGrid = data.frame(mtry = 3), 
+ #                trControl=tr)
 proc.time()- time
-
+plot(model_rf)
 model_rf
 names(model_rf)
 model_rf$results
@@ -120,6 +108,7 @@ summary(model_rf)
 gbmImp <- varImp(model_rf, scale = TRUE)
 gbmImp
 
+setwd(file.path(Working_path))
 
 saveRDS(gbmImp,file = "RESULT/Model_varimportance_train_RF")
 #readRDS("SVM_Train_varimportance")
@@ -136,8 +125,8 @@ saveRDS(model_rf, "RESULT/super_model_RF")
 # Do not change
 
 library(gmodels)
-pred_train <-predict(model_rf, TrainSet[,-13])
-pred_valid <-predict(model_rf, ValidSet[,-13])
+pred_train <-predict(model_rf, TrainSet[,-12])
+pred_valid <-predict(model_rf, ValidSet[,-12])
 
 # ROC plots ---------------------------------------------------------------
 
@@ -176,11 +165,10 @@ dput(perf.auc_valid, "RESULT/Perf_AUC_RF.txt")
   
 # Predict raster with produced Super Model --------------------------------
 ## Apply to raster prediction
-raster_data <- stack(altitude, aspect, corine, curvature, drenaj, fay, jeoloji, slope, twi, yol, cls)
-names(raster_data)
 r1 <- raster::predict(raster_data, model_rf, progress="text")
 plot(r1)
 
 writeRaster(r1,"RESULT/Result_RF.tif", overwrite=TRUE)
 t_end <- proc.time() - time
 cat(sprintf("Program Ended in %5.1f second!!!\n", t_end[3]))
+  
