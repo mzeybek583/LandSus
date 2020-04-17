@@ -57,10 +57,7 @@ data_df_NA <- na.omit(data_df)
 ## Check NA 
 sapply(data_df_NA, function(x)sum(is.na(x)))
 # data_df_NA <- as.data.frame(lapply(data_df_NA, normalize))
-## Random sampling to sampling data
-# Sample variable
-smpl <- 500
-rto <- 0.7 # Train vs Test raio
+
 
 ## Random sampling to 10000 data
 heyelan <- data_df_NA[data_df_NA$study_area_heyelan==1,]
