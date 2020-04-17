@@ -7,51 +7,35 @@ library(raster)
 library(sp)
 library(rgdal)
 library(caret) 
-#library(doParallel)
 
+#library(doParallel)
 #registerDoParallel(cores = 3)
 set.seed(917);   
-
-#setwd("pathToDirHere") # set the working directory to the data
 
 # time 
 time <- proc.time()
 
-
 # DATA --------------------------------------------------------------------
-# import raw data tiffs
-altitude <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/altitude.tif"
-aspect <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/aspect.tif"
-corine <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/corine.tif"
-curvature <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/curvature.tif"
-drenaj <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/dist_drenaj.tif"
-fay <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/dist_fay.tif"
-jeoloji <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/jeoloji.tif"
-slope <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/slope.tif"
-yol <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/dist_yol.tif"
-twi <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/twi.tif" 
-#twi <- "../Data/R_SVM/twi.tif"
+# change
+Tiff_path <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/" 
+Working_path <- "/home/mzeybek/LandSus/Code/" # change
+smpl <- 500 # Sample variable
+rto <- 0.7 # Train vs Test raio
 
-# Landslide Ground Truth DATA
+setwd(Tiff_path)
 
-cls <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/study_area_heyelan/study_area_heyelan.tif"
-
-# Save Exports to RESULT folder --------------------------------------------------
-mainDir <- "/home/mzeybek/LandSus/Code/"
-subDir <- "RESULT"
-
-dir.create(file.path(mainDir, subDir), showWarnings = FALSE)
-setwd(file.path(mainDir))
-
-# create raster stack
-raster_data <- stack(altitude, aspect, corine, curvature, drenaj, fay, jeoloji, slope, twi, yol, cls)
+# Save Exports to RESULT folder
+Result_Dir <- "RESULT" # Output file # Do not change
+temp = list.files(path = Tiff_path , pattern="\\.tif$", 
+                  full.names = FALSE, recursive = TRUE)
+raster_data <- raster::stack(paste0(temp))
+dir.create(file.path(Working_path, Result_Dir), showWarnings = FALSE)
 
 # check attributes
 raster_data
 proc.time()- time
 names(raster_data)
 data_df <- as.data.frame(raster_data, xy=TRUE)
-rm(raster_data)
 
 # Train Formula -----------------------------------------------------------
 
@@ -93,13 +77,16 @@ summary(TrainSet)
 summary(ValidSet)
 
 ## All subsequent models are then run in parallel
-#train_control <- trainControl(method="LOOCV")
-ctrl <- trainControl(method = "repeatedcv", number = 10, savePredictions = TRUE)
 
+fitControl <- trainControl(## 10-fold CV
+  method = "repeatedcv",
+  number = 10,
+  ## repeated ten times
+  repeats = 10)
 # Create Model ------------------------------------------------------------
 
 model_glm <- train(formula, data = TrainSet, 
-                   trControl = ctrl, method = "glm",
+                   trControl = fitControl, method = "glm",
                    family = "binomial",preProc = c("center", "scale")) 
 
 proc.time() -time
@@ -111,6 +98,8 @@ summary(model_glm)
 
 gbmImp <- varImp(model_glm, scale = TRUE)
 gbmImp
+setwd(file.path(Working_path))
+
 saveRDS(gbmImp,"RESULT/Model_varimportance_train_LogReg")
 #readRDS("Logreg_Train_varimportance")
 
