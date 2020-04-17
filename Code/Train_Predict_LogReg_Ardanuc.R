@@ -58,7 +58,6 @@ data_df_NA <- na.omit(data_df)
 sapply(data_df_NA, function(x)sum(is.na(x)))
 # data_df_NA <- as.data.frame(lapply(data_df_NA, normalize))
 
-
 ## Random sampling to 10000 data
 heyelan <- data_df_NA[data_df_NA$study_area_heyelan==1,]
 heyelan_degil <- data_df_NA[data_df_NA$study_area_heyelan==0,]
@@ -110,8 +109,8 @@ saveRDS(model_glm, "RESULT/super_model_LogReg")
 # Do not change
 
 library(gmodels)
-pred_train <-predict(model_glm, TrainSet[,-13])
-pred_valid <-predict(model_glm, ValidSet[,-13])
+pred_train <-predict(model_glm, TrainSet[,-12])
+pred_valid <-predict(model_glm, ValidSet[,-12])
 
 library(ROCR)
 pred <- prediction(predictions = pred_train, labels = TrainSet$study_area_heyelan)
@@ -148,8 +147,6 @@ dput(perf.auc_valid, "RESULT/Perf_AUC_LogReg.txt")
 
 # Predict raster with produced Super Model --------------------------------
 ## Apply to raster prediction
-raster_data <- stack(altitude, aspect, corine, curvature, drenaj, fay, jeoloji, slope, twi, yol, cls)
-names(raster_data)
 r1 <- raster::predict(raster_data, model_glm, progress="text")
 plot(r1)
 
