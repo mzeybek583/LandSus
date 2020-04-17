@@ -114,7 +114,8 @@ saveRDS(gbmImp,file = "RESULT/Model_varimportance_train_RF")
 #readRDS("SVM_Train_varimportance")
 
 #png("TRAIN_varImportance_SVM.png")
-tiff("RESULT/Model_varimportance_train_RF.tiff", units="cm", width=8, height=8, res=600)
+tiff("RESULT/Model_varimportance_train_RF.tiff", units="cm", 
+     width=8, height=8, res=600)
 plot(gbmImp, top = 10)
 dev.off()
 
@@ -131,8 +132,10 @@ pred_valid <-predict(model_rf, ValidSet[,-12])
 # ROC plots ---------------------------------------------------------------
 
 library(ROCR)
-pred <- prediction(predictions = pred_train, labels = TrainSet$study_area_heyelan)
-pred_valid <- prediction(predictions = pred_valid, labels = ValidSet$study_area_heyelan)
+pred <- prediction(predictions = pred_train, 
+                   labels = TrainSet$study_area_heyelan)
+pred_valid <- prediction(predictions = pred_valid, 
+                         labels = ValidSet$study_area_heyelan)
 
 perf <- performance(pred, measure = "tpr", x.measure = "fpr")
 perf_valid <- performance(pred_valid, measure = "tpr", x.measure = "fpr")
@@ -140,7 +143,8 @@ saveRDS(perf_valid,"RESULT/ROC_Curve_valid_RF")
 #aa <- readRDS("Logreg_validation_ROC")
 #png("TRAIN_roc_curve_train_LogReg.png")
 tiff("RESULT/ROC_Curve_train_RF.tiff", units="cm", width=8, height=8, res=600)
-plot(perf, main = "ROC curve for Landslide Detection Train Data (RF)", col = "blue", lwd = 3)
+plot(perf, main = "ROC curve for Landslide Detection Train Data (RF)", 
+     col = "blue", lwd = 3)
 abline(a = 0, b = 1, lwd = 2, lty = 2)
 dev.off()
 
@@ -153,7 +157,8 @@ dput(perf.auc, "RESULT/Perf_AUC_train_RF.txt")
 #png("TRAIN_roc_curve_valid_SVM.png")
 tiff("RESULT/ROC_Curve_valid_RF.tiff", units="cm", width=8, height=8, res=600)
 
-plot(perf_valid, main = "ROC curve for Landslide Detection Validation Data (RF)", col = "blue", lwd = 3)
+plot(perf_valid, main = "ROC curve for Landslide Detection Validation Data (RF)",
+     col = "blue", lwd = 3)
 abline(a = 0, b = 1, lwd = 2, lty = 2)
 dev.off()
 
