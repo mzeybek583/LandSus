@@ -8,9 +8,12 @@ library(raster)
 library(sp)
 library(rgdal)
 library(caret) 
+library(doParallel)
 
-#library(doParallel)
-#registerDoParallel(cores = 3)
+N_CORES <- detectCores()
+
+cl <- makePSOCKcluster(N_CORES-1) # cores
+registerDoParallel(cl)
 
 set.seed(917);   
 time <- proc.time()# time 
@@ -21,14 +24,16 @@ Tiff_path <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM
 Working_path <- "/home/mzeybek/LandSus/Code/" # change
 smpl <- 500 # Sample variable
 rto <- 0.7 # Train vs Test raio
+##
 
 setwd(Tiff_path)
 
-# Save Exports to RESULT folder
-Result_Dir <- "RESULT" # Output file # Do not change
 temp = list.files(path = Tiff_path , pattern="\\.tif$", 
                   full.names = FALSE, recursive = TRUE)
 raster_data <- raster::stack(paste0(temp))
+
+# Save Exports to RESULT folder
+Result_Dir <- "RESULT" # Output file # Do not change
 dir.create(file.path(Working_path, Result_Dir), showWarnings = FALSE)
 
 # check attributes
@@ -174,6 +179,9 @@ r1 <- raster::predict(raster_data, model_rf, progress="text")
 plot(r1)
 
 writeRaster(r1,"RESULT/Result_RF.tif", overwrite=TRUE)
+
+stopCluster(cl)
+
 t_end <- proc.time() - time
 cat(sprintf("Program Ended in %5.1f second!!!\n", t_end[3]))
   
