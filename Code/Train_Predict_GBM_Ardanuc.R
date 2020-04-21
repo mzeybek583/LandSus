@@ -8,9 +8,12 @@ library(raster)
 library(sp)
 library(rgdal)
 library(caret) 
+library(doParallel)
 
-#library(doParallel)
-#registerDoParallel(cores = 3)
+N_CORES <- detectCores()
+
+cl <- makePSOCKcluster(N_CORES-1) # cores
+registerDoParallel(cl)
 
 set.seed(917);   
 time <- proc.time()# time 
@@ -166,5 +169,8 @@ r1 <- raster::predict(raster_data, model_gbm, progress="text")
 plot(r1)
 
 writeRaster(r1,"RESULT/Result_GBM.tif", overwrite=TRUE)
+
+stopCluster(cl)
+
 t_end <- proc.time() - time
 cat(sprintf("Program Ended in %5.1f second!!!\n", t_end[3]))

@@ -7,6 +7,7 @@ library(raster)
 library(sp)
 library(rgdal)
 library(caret) 
+library(doParallel)
 
 N_CORES <- detectCores()
 
