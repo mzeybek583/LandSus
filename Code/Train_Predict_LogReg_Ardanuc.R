@@ -129,6 +129,7 @@ con_data <- as.factor(con_data)
 con_reference <- unlist(TrainSet$study_area_heyelan)
 con_reference <- as.factor(con_reference)
 con_mat <- confusionMatrix(data = con_data, reference = con_reference)
+con_mat
 tocsv <- data.frame(cbind(t(con_mat$overall),t(con_mat$byClass)))
 write.csv(tocsv,"RESULT/LogReg_train_confusionMatrix.csv")
 
