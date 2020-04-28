@@ -132,7 +132,7 @@ pred <- prediction(predictions = pred_train, labels = TrainSet$study_area_heyela
 pred_valid <- prediction(predictions = pred_valid, 
                          labels = ValidSet$study_area_heyelan)
 
-#Confusion Qriteria
+#Confusion Qriteria TRAIN
 con_data <- unlist(pred_train)
 con_data
 con_data[con_data<=0.5] <- 0
@@ -140,7 +140,9 @@ con_data[con_data>0.5] <- 1
 con_data <- as.factor(con_data)
 con_reference <- unlist(TrainSet$study_area_heyelan)
 con_reference <- as.factor(con_reference)
-confusionMatrix(data = con_data, reference = con_reference)
+con_mat <- confusionMatrix(data = con_data, reference = con_reference)
+tocsv <- data.frame(cbind(t(con_mat$overall),t(con_mat$byClass)))
+write.csv(tocsv,"RESULT/GBM_train_confusionMatrix.csv")
 
 perf <- performance(pred, measure = "tpr", x.measure = "fpr")
 perf_valid <- performance(pred_valid, measure = "tpr", x.measure = "fpr")
