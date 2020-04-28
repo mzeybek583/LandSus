@@ -22,7 +22,7 @@ time <- proc.time()# time
 # change
 Tiff_path <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/R_SVM/" 
 Working_path <- "/home/mzeybek/LandSus/Code/" # change
-smpl <- 500 # Sample variable
+smpl <- 300 # Sample variable
 rto <- 0.7 # Train vs Test raio
 
 setwd(Tiff_path)
@@ -131,6 +131,16 @@ library(ROCR)
 pred <- prediction(predictions = pred_train, labels = TrainSet$study_area_heyelan)
 pred_valid <- prediction(predictions = pred_valid, 
                          labels = ValidSet$study_area_heyelan)
+
+#Confusion Qriteria
+con_data <- unlist(pred_train)
+con_data
+con_data[con_data<=0.5] <- 0
+con_data[con_data>0.5] <- 1
+con_data <- as.factor(con_data)
+con_reference <- unlist(TrainSet$study_area_heyelan)
+con_reference <- as.factor(con_reference)
+confusionMatrix(data = con_data, reference = con_reference)
 
 perf <- performance(pred, measure = "tpr", x.measure = "fpr")
 perf_valid <- performance(pred_valid, measure = "tpr", x.measure = "fpr")
