@@ -21,7 +21,7 @@ time <- proc.time()
 
 # DATA --------------------------------------------------------------------
 # change
-Tiff_path <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/data_v2/" 
+Tiff_path <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/data_v3/" 
 Working_path <- "/home/mzeybek/LandSus/Code/" # change
 smpl <- 100 # Sample variable
 rto <- 0.7 # Train vs Test raio
