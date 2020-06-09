@@ -1,11 +1,8 @@
 # Programmer: Dr. Mustafa ZEYBEK
 
-# Naive Bayes
-#Naive Bayes is one of the simplest classification algorithms,
-# but it can also be very accurate. At a high level, Naive Bayes 
-# tries to classify instances based on the probabilities of 
-# previously seen attributes/instances, assuming complete 
-# attribute independence
+# Correlation test on landlside attiributes
+
+library(corrplot)
 
 rm(list = ls()) #Remove everything
 # load the raster, sp, and rgdal packages
@@ -94,62 +91,18 @@ summary(TrainSet)
 summary(ValidSet)
 proc.time()- time
 
-## All subsequent models are then run in parallel
+# Plot Cor
+C4 <- model.data[model.data$study_area_heyelan==4,]
+#C4 <- C4[order(C4$x),]
+C4 <- C4[,-c(1,2,12,14)]
+C4 = apply(C4, 2, function(x) as.numeric(as.character(x)));
 
-fitControl <- trainControl(## 10-fold CV
-  method = "repeatedcv",
-  number = 10,
-  ## repeated ten times
-  repeats = 10)
+C5 <- model.data[model.data$study_area_heyelan==5,]
+#C5 <- C5[order(C5$x),]
+C5 <- C5[,-c(1,2,12,14)]
+C5 = apply(C5, 2, function(x) as.numeric(as.character(x)));
 
-#Train and Tune the SVM
+str(C4)
+cor_mat <- cor(C4, C5)
 
-model_nb <- train(formula, data = TrainSet,
-                   method = "nb",
-                   preProc = c("center","scale"),
-                   #tuneGrid = grid,
-                   trControl= fitControl) 
-proc.time()- time
-
-model_nb
-names(model_nb)
-model_nb$results
-summary(model_nb)
-
-gbmImp <- varImp(model_nb, scale = TRUE)
-gbmImp
-
-setwd(file.path(Working_path))
-
-saveRDS(gbmImp,"RESULT/Model_varimportance_train_NB_class")
-#readRDS("SVM_Train_varimportance")
-
-#png("TRAIN_varImportance_SVM.png")
-tiff("RESULT/Model_varimportance_train_NB_v2.tiff", units="cm", width=8, height=8, res=600)
-plot(gbmImp, top = 10)
-dev.off()
-
-# Do not change
-saveRDS(model_nb, "RESULT/super_model_NB_v2")
-# Do not change
-
-library(gmodels)
-pred_train <-predict(model_nb, TrainSet[,-12])
-pred_valid <-predict(model_nb, ValidSet[,-12])
-
-# Confusion Table Create
-# https://www.wikiwand.com/en/Confusion_matrix
-confusionMatrix(pred_train, TrainSet[,12], positive="1")
-confusionMatrix(pred_valid, ValidSet[,12], positive="1")
-
-# Predict raster with produced Super Model --------------------------------
-## Apply to raster prediction
-r1 <- raster::predict(raster_data, model_nb, progress="text")
-plot(r1)
-
-writeRaster(r1,"RESULT/Result_NB_v2.tif", overwrite=TRUE)
-
-#stopCluster(cl)
-
-t_end <- proc.time() - time
-cat(sprintf("Program Ended in %5.1f second!!!\n", t_end[3]))
+corrplot(cor_mat, method="circle")
