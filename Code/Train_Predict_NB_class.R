@@ -14,6 +14,7 @@ library(sp)
 library(rgdal)
 library(caret) 
 library(doParallel)
+#The package klaR contains Naive Ba   yes classifier.
 library(klaR)
 
 #N_CORES <- detectCores()
