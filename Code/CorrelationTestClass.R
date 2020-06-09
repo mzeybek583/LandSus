@@ -1,6 +1,7 @@
 # Programmer: Dr. Mustafa ZEYBEK
-
 # Correlation test on landlside attiributes
+
+## ONGOING !!
 
 library(corrplot)
 
@@ -106,3 +107,12 @@ str(C4)
 cor_mat <- cor(C4, C5)
 
 corrplot(cor_mat, method="circle")
+
+summary(C4)
+summary(C5)
+library(psych)
+
+an1 <- describe(C4)
+an2 <- describe(C5)
+
+pairs.panels(C4)
