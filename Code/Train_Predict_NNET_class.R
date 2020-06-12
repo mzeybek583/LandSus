@@ -105,7 +105,8 @@ model_nnet <- train(formula, data = TrainSet,
                   preProc = c("center","scale"),
                   #tuneGrid = grid,
                   trControl= fitControl,
-                  nodesize=100) 
+                  nodesize=100,
+                  trace=FALSE) 
 proc.time()- time
 
 model_nnet
