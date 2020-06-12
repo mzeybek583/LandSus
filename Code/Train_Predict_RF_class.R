@@ -1,14 +1,7 @@
 # Programmer: Dr. Mustafa ZEYBEK
 
-# Multi-Layer Perceptron model
+## Random Forest Classification
 
-# A multilayer perceptron (MLP) is a feedforward artificial neural network.
-# This is actually not precisely the latest and greatest of the deep learning 
-# or neural network algorithms. All the same, this is the type of neural network
-# one tends to start with learning. At its heart, a neural network is just a lot 
-# of linear algebra matrix multiplication that gets optimized by the algorithm. 
-# The net effect is that, rather than a standard regression  equation that has 
-# one weight per predictor variable, there is a rather vast array of weights.
 
 rm(list = ls()) #Remove everything
 # load the raster, sp, and rgdal packages
@@ -17,8 +10,8 @@ library(sp)
 library(rgdal)
 library(caret) 
 library(doParallel)
-
-#library(RSNNS)
+#The package klaR contains Naive Ba   yes classifier.
+library(klaR)
 
 #N_CORES <- detectCores()
 
@@ -107,38 +100,39 @@ fitControl <- trainControl(## 10-fold CV
 
 #Train and Tune the SVM
 
-model_MLP <- train(formula, data = TrainSet,
-                  method = "mlpML",
+model_rf <- train(formula, data = TrainSet,
+                  method = "rf",
                   preProc = c("center","scale"),
                   #tuneGrid = grid,
-                  trControl= fitControl) 
+                  trControl= fitControl,
+                  nodesize=100) 
 proc.time()- time
 
-model_MLP
-names(model_MLP)
-model_MLP$results
-summary(model_MLP)
+model_rf
+names(model_rf)
+model_rf$results
+summary(model_rf)
 
-gbmImp <- varImp(model_MLP, scale = TRUE)
+gbmImp <- varImp(model_rf, scale = TRUE)
 gbmImp
 
 setwd(file.path(Working_path))
 
-saveRDS(gbmImp,"RESULT/Model_varimportance_train_MLP_class")
+saveRDS(gbmImp,"RESULT/Model_varimportance_train_RF_class")
 #readRDS("SVM_Train_varimportance")
 
 #png("TRAIN_varImportance_SVM.png")
-tiff("RESULT/Model_varimportance_train_MLP_v2.tiff", units="cm", width=8, height=8, res=600)
+tiff("RESULT/Model_varimportance_train_RF_v2.tiff", units="cm", width=8, height=8, res=600)
 plot(gbmImp, top = 10)
 dev.off()
 
 # Do not change
-saveRDS(model_MLP, "RESULT/super_model_MLP_v2")
+saveRDS(model_rf, "RESULT/super_model_Rf_v2")
 # Do not change
 
 library(gmodels)
-pred_train <-predict(model_MLP, TrainSet[,-12])
-pred_valid <-predict(model_MLP, ValidSet[,-12])
+pred_train <-predict(model_rf, TrainSet[,-12])
+pred_valid <-predict(model_rf, ValidSet[,-12])
 
 # Confusion Table Create
 # https://www.wikiwand.com/en/Confusion_matrix
@@ -147,10 +141,10 @@ confusionMatrix(pred_valid, ValidSet[,12], positive="1")
 
 # Predict raster with produced Super Model --------------------------------
 ## Apply to raster prediction
-r1 <- raster::predict(raster_data, model_MLP, progress="text")
-    plot(r1)
+r1 <- raster::predict(raster_data, model_rf, progress="text")
+plot(r1)
 
-writeRaster(r1,"RESULT/Result_MLP_v2.tif", overwrite=TRUE)
+writeRaster(r1,"RESULT/Result_RF_v2.tif", overwrite=TRUE)
 
 #stopCluster(cl)
 
