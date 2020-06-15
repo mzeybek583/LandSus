@@ -123,6 +123,16 @@ pred_valid <-predict(model_cv, ValidSet[,-12])
 confusionMatrix(pred_train, TrainSet[,12], positive="1")
 confusionMatrix(pred_valid, ValidSet[,12], positive="1")
 
+# save to file 
+# NOT TESTED!!15.06.2020!
+cm1<-confusionMatrix(pred_train, TrainSet[,12], positive="1")
+cm2<- confusionMatrix(pred_valid, ValidSet[,12], positive="1")
+tocsv1 <- data.frame(cbind(t(cm1$overall),t(cm1$byClass)))
+tocsv2 <- data.frame(cbind(t(cm2$overall),t(cm2$byClass)))
+
+# You can then use
+write.csv(tocsv1,file="RESULT/confusuion_train.csv")
+write.csv(tocsv2,file="RESULT/confusuion_prediction.csv")
 
 # Predict raster with produced Super Model --------------------------------
 ## Apply to raster prediction
