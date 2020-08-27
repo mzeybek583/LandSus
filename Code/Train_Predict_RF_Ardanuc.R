@@ -93,7 +93,15 @@ model_rf <-train(formula, data= TrainSet, method='rf',
                  preProcess = c("center","scale"), 
              #    ntree = 1000,
                  nodesize=100)
+## Collinearity check
 
+library(car)
+library(corrplot)
+
+corrplot(cor(TrainSet[, c(-1,-2,-12)]), method = "number", type = "upper", diag = FALSE)
+model <- lm(formula, TrainSet)
+vif(model)
+summary(model)
 #                 metric='ROC', 
 #tuneGrid = data.frame(mtry = 3), 
 #                 trControl=tr)
