@@ -88,7 +88,21 @@ fitControl <- trainControl(## 10-fold CV
 model_glm <- train(formula, data = TrainSet, 
                    trControl = fitControl, method = "glm",
                    family = "binomial",preProc = c("center", "scale")) 
+## Collinearity check
 
+library(car)
+library(corrplot)
+
+png(filename = "corplot.png")
+corrplot(cor(TrainSet[, c(-1,-2,-12)]), method = "number", 
+         type = "upper", diag = FALSE, tl.cex = 1.2, cl.cex = 1.2)
+
+dev.off()
+model <- lm(formula, TrainSet)
+vif(model)
+vif(model_glm$finalModel)
+
+summary(model)
 proc.time() -time
 model_glm
 
