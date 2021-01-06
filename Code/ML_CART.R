@@ -25,7 +25,7 @@ time <- proc.time()
 
 Tiff_path <- "D:/data"
 Working_path <- "D:/Landsus/LandSus/Code" 
-smpl <- 1000 # number of landslide pixels
+smpl <- 38440 # number of landslide pixels
 rto <- 0.7 # Training and validating ratio
 
 setwd(Tiff_path)
