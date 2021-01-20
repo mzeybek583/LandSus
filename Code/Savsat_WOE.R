@@ -1,9 +1,13 @@
 
 # Weight of Evidence
+# WOE describes the relationship between a predictive variable 
+# and a binary target variable.
+# IV measures the strength of that relationship.
 
 #References
 
-#Good, I. (1950): Probability and the Weighting of Evidences. Charles Griffin, London.
+#Good, I. (1950): Probability and the Weighting of Evidences. Charles Griffin, 
+#London.
 
 #Kullback, S. (1959): Information Theory and Statistics. Wiley, New York.
 
@@ -13,9 +17,11 @@
 
 #[2] Kullback S., Information Theory and Statistics, John Wiley and Sons, 1959.
 
-#[3] Shannon, C.E., A Mathematical Theory of Communication, Bell System Technical Journal, 1948.
+#[3] Shannon, C.E., A Mathematical Theory of Communication, Bell System 
+#Technical Journal, 1948.
 
-#[4] Shannon, CE. and Weaver, W. The Mathematical Theory of Communication. Univ of Illinois Press, 1949.
+#[4] Shannon, CE. and Weaver, W. The Mathematical Theory of Communication. 
+#Univ of Illinois Press, 1949.
 
 #[5] GAM: the Predictive Modeling Silver Bullet, (via)
 ##
@@ -25,6 +31,7 @@ rm(list = ls()) #Remove everything
 
 #install.packages("Information")
 library(Information)
+
 # load the required packages
 library(raster)
 library(sp)
@@ -38,18 +45,24 @@ library(klaR)
 
 # Calculate the number of cores
 num_cores <- detectCores() - 1
-registerDoParallel(num_cores)
+cl <- makePSOCKcluster(num_cores)
+registerDoParallel(cl)
 set.seed(917);   
 
 # time
 time <- proc.time() 
 
-# RASTER DATA --------------------------------------------------------------------
+# RASTER DATA --------------------------(Change here)------------------------------------------
 
 Tiff_path <- "D:/data"
 Working_path <- "D:/Landsus/LandSus/Code" 
-smpl <- 1000 # number of landslide pixels
+smpl <- 50000 # number of landslide pixels
 rto <- 0.7 # Training and validating ratio
+
+
+# -------------------------------------------------------------------------
+
+
 
 setwd(Tiff_path)
 
@@ -146,5 +159,7 @@ for (i in 1:length(names)){
 }
 # Showing the top 18 variables
 plots[1:11]
+
+stopCluster(cl) 
 
 sprintf("Processing time is %3.3f sec.", (proc.time()- time)[3])
