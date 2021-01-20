@@ -42,11 +42,14 @@ library(recipes)
 library(dplyr)
 library(doParallel)
 library(klaR)
+library(parallel)
+library(doSNOW)
 
 # Calculate the number of cores
-num_cores <- detectCores() - 1
-cl <- makePSOCKcluster(num_cores)
-registerDoParallel(cl)
+numberofcores = detectCores() -1  # review what number of cores does for your environment
+
+cl <- makeCluster(numberofcores, type = "SOCK")
+
 set.seed(917);   
 
 # time
