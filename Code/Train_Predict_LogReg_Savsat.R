@@ -94,6 +94,7 @@ model_glm <- train(formula, data = TrainSet,
 
 library(car)
 library(corrplot)
+png(filename = "corplot_savsat.png")
 col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
 p.mat <- cor.mtest(TrainSet[, c(-1,-2,-10)])
 corrplot(cor(TrainSet[, c(-1,-2,-10)]), method="color", col=col(200),  
@@ -105,14 +106,15 @@ corrplot(cor(TrainSet[, c(-1,-2,-10)]), method="color", col=col(200),
          # hide correlation coefficient on the principal diagonal
          diag=TRUE ,tl.cex = 0.5, cl.cex = 0.5, number.cex = 0.7
 )
-png(filename = "corplot_savsat.png")
-corrplot(cor(TrainSet[, c(-1,-2,-10)]), method = "number", 
-         type = "upper", diag = FALSE, tl.cex = 1.2, cl.cex = 1.2)
-
 dev.off()
+
 model <- lm(formula, TrainSet)
 vif(model)
+
 vif(model_glm$finalModel)
+
+vif.export <- vif(model_glm$finalModel)
+write.table(vif.export , file = "RESULT/vif_values_savsat.txt", quote = FALSE)
 
 summary(model)
 proc.time() -time
