@@ -94,7 +94,7 @@ model_glm <- train(formula, data = TrainSet,
 
 library(car)
 library(corrplot)
-png(filename = "corplot_savsat.png")
+png(filename = "RESULT/corplot_savsat.png")
 col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
 p.mat <- cor.mtest(TrainSet[, c(-1,-2,-10)])
 corrplot(cor(TrainSet[, c(-1,-2,-10)]), method="color", col=col(200),  
