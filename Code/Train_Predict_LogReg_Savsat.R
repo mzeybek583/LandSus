@@ -8,6 +8,9 @@ library(sp)
 library(rgdal)
 library(caret) 
 library(doParallel)
+library(car)
+library(e1071) 
+library(rpart)
 
 N_CORES <- detectCores()
 
@@ -51,8 +54,6 @@ formula <- landslide_non_landslide ~ Altitude + Aspect + Curvature +
 normalize <- function(x) { return((x - min(x)) / (max(x) - min(x))) }
 
 #data_df_norm <- as.data.frame(lapply(data_df[], normalize))
-library(e1071) 
-library(rpart)
 
 #Control NA
 sapply(data_df, function(x)sum(is.na(x)))
@@ -92,8 +93,6 @@ model_glm <- train(formula, data = TrainSet,
                    family = "binomial",preProc = c("center", "scale")) 
 ## Collinearity check
 
-
-
 model <- lm(formula, TrainSet)
 vif(model)
 
@@ -116,10 +115,8 @@ setwd(file.path(Working_path))
 
 # Corplot -----------------------------------------------------------------
 
-library(car)
 library(corrplot)
-tiff("RESULT/corplot_savsat.tiff", units="cm", width=18, height=18, res=600)
-
+tiff("RESULT/corplot_savsat.tiff", units="cm", width=21, height=21, res=600)
 #png(filename = "RESULT/corplot_savsat.png",width = 480, height = 480, 
 #    units = "px", pointsize = 12)
 col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
@@ -140,11 +137,24 @@ dev.off()
 
 write.table(vif.export , file = "RESULT/vif_values_savsat.txt", quote = FALSE)
 
+#create horizontal bar chart to display each VIF value
+par(mar=c(5,6,4,1)+1)
+#add room for the rotated labels
+tiff("RESULT/vifplot_savsat.tiff", units="cm", width=21, height=18, res=300)
+#x11()
+barplot(vif.export, horiz = TRUE, col = "steelblue", las=1)
+#add vertical line at 5
+abline(v = 1, lwd = 3, lty = 2)
+
+dev.off()
+par(mar=c(5,4,4,1)+.1)
+
 saveRDS(gbmImp,"RESULT/Model_varimportance_train_LogReg_savsat")
 #readRDS("Logreg_Train_varimportance")
 
 #png("TRAIN_varImportance_LogReg.png")
-tiff("RESULT/Model_varimportance_train_LogReg_savsat.tiff", units="cm", width=8, height=8, res=600)
+tiff("RESULT/Model_varimportance_train_LogReg_savsat.tiff", units="cm", width=21,
+     height=21, res=600)
 plot(gbmImp, top = 10)
 dev.off()
 
@@ -178,7 +188,7 @@ perf_valid <- performance(pred_valid, measure = "tpr", x.measure = "fpr")
 saveRDS(perf_valid,"RESULT/ROC_Curve_valid_Logreg_savsat")
 #aa <- readRDS("Logreg_validation_ROC")
 #png("TRAIN_roc_curve_train_LogReg.png")
-tiff("RESULT/ROC_Curve_train_LogReg_savsat.tiff", units="cm", width=8, height=8, res=600)
+tiff("RESULT/ROC_Curve_train_LogReg_savsat.tiff", units="cm", width=21, height=21, res=600)
 plot(perf, main = "ROC curve for Landslide Detection Train Data (LogReg) Savsat", col = "blue", lwd = 3)
 abline(a = 0, b = 1, lwd = 2, lty = 2)
 dev.off()
@@ -190,7 +200,7 @@ unlist(perf.auc@y.values)
 dput(perf.auc, "RESULT/Perf_AUC_train_LogReg_savsat.txt")
 
 #png("TRAIN_roc_curve_valid_LogReg.png")
-tiff("RESULT/ROC_Curve_valid_LogReg_savsat.tiff", units="cm", width=8, height=8, res=600)
+tiff("RESULT/ROC_Curve_valid_LogReg_savsat.tiff", units="cm", width=21, height=21, res=600)
 
 plot(perf_valid, main = "ROC curve for Landslide Detection Validation Data (LogReg) Savsat", col = "blue", lwd = 3)
 abline(a = 0, b = 1, lwd = 2, lty = 2)
