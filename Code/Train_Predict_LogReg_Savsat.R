@@ -23,7 +23,7 @@ time <- proc.time()
 # change
 Tiff_path <- "/media/mzeybek/7C6879566879105E/LandslideSusceptibility/Data/savsat/data" 
 Working_path <- "/home/mzeybek/LandSus/Code/" # change
-smpl <- 500 # Sample variable
+smpl <- 1000 # Sample variable
 rto <- 0.7 # Train vs Test raio
 
 setwd(Tiff_path)
@@ -92,6 +92,30 @@ model_glm <- train(formula, data = TrainSet,
                    family = "binomial",preProc = c("center", "scale")) 
 ## Collinearity check
 
+
+
+model <- lm(formula, TrainSet)
+vif(model)
+
+vif(model_glm$finalModel)
+
+vif.export <- vif(model_glm$finalModel)
+
+summary(model)
+proc.time() -time
+model_glm
+
+names(model_glm)
+model_glm$results
+summary(model_glm)
+
+gbmImp <- varImp(model_glm, scale = TRUE)
+gbmImp
+setwd(file.path(Working_path))
+
+
+# Corplot -----------------------------------------------------------------
+
 library(car)
 library(corrplot)
 png(filename = "RESULT/corplot_savsat.png")
@@ -108,25 +132,10 @@ corrplot(cor(TrainSet[, c(-1,-2,-10)]), method="color", col=col(200),
 )
 dev.off()
 
-model <- lm(formula, TrainSet)
-vif(model)
 
-vif(model_glm$finalModel)
+# VIF export to file ------------------------------------------------------
 
-vif.export <- vif(model_glm$finalModel)
 write.table(vif.export , file = "RESULT/vif_values_savsat.txt", quote = FALSE)
-
-summary(model)
-proc.time() -time
-model_glm
-
-names(model_glm)
-model_glm$results
-summary(model_glm)
-
-gbmImp <- varImp(model_glm, scale = TRUE)
-gbmImp
-setwd(file.path(Working_path))
 
 saveRDS(gbmImp,"RESULT/Model_varimportance_train_LogReg_savsat")
 #readRDS("Logreg_Train_varimportance")
