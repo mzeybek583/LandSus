@@ -118,7 +118,10 @@ setwd(file.path(Working_path))
 
 library(car)
 library(corrplot)
-png(filename = "RESULT/corplot_savsat.png")
+tiff("RESULT/corplot_savsat.tiff", units="cm", width=18, height=18, res=600)
+
+#png(filename = "RESULT/corplot_savsat.png",width = 480, height = 480, 
+#    units = "px", pointsize = 12)
 col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
 p.mat <- cor.mtest(TrainSet[, c(-1,-2,-10)])
 corrplot(cor(TrainSet[, c(-1,-2,-10)]), method="color", col=col(200),  
@@ -128,7 +131,7 @@ corrplot(cor(TrainSet[, c(-1,-2,-10)]), method="color", col=col(200),
          # Combine with significance
          #p.mat = p.mat, sig.level = 0.01, insig = "blank", 
          # hide correlation coefficient on the principal diagonal
-         diag=TRUE ,tl.cex = 0.5, cl.cex = 0.5, number.cex = 0.7
+         diag=TRUE ,tl.cex = 0.7, cl.cex = 0.7, number.cex = 0.7
 )
 dev.off()
 
