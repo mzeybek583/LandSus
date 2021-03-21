@@ -11,6 +11,7 @@ library(doParallel)
 library(car)
 library(e1071) 
 library(rpart)
+library(ggplot2)
 
 N_CORES <- detectCores()
 
@@ -138,16 +139,17 @@ dev.off()
 write.table(vif.export , file = "RESULT/vif_values_savsat.txt", quote = FALSE)
 
 #create horizontal bar chart to display each VIF value
-par(mar=c(5,6,4,1)+1)
-#add room for the rotated labels
-tiff("RESULT/vifplot_savsat.tiff", units="cm", width=21, height=18, res=300)
-#x11()
-barplot(vif.export, horiz = TRUE, col = "steelblue", las=1)
-#add vertical line at 5
-abline(v = 1, lwd = 3, lty = 2)
+# VIF plot
+vif.df <- data.frame()
+vif.df <- data.frame(vif.export)
+vif.df$vif.names <- rownames(vif.df)
+vif.df
+p<-ggplot(data=vif.df, aes(x=vif.export, y=vif.names)) +
+  geom_bar(stat="identity", fill="steelblue") + xlab("") + ylab("")+
+  theme_bw(base_size = 20)
+p
+ggsave("RESULT/vif.plot_savsat.png", width=20, height=20, units = "cm", dpi = 600)
 
-dev.off()
-par(mar=c(5,4,4,1)+.1)
 
 saveRDS(gbmImp,"RESULT/Model_varimportance_train_LogReg_savsat")
 #readRDS("Logreg_Train_varimportance")
